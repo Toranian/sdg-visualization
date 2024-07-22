@@ -81,7 +81,8 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
   const color = d3.scaleSequential([0, 100], d3.interpolateYlGnBu);
 
   const projection = d3
-    .geoMercator()
+    .geoNaturalEarth1()
+    .rotate([-10, 0]) // don't let Russia wrap
     .fitSize([width, height], { type: "Sphere" });
   const path = d3.geoPath(projection);
 
