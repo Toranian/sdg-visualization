@@ -1,3 +1,6 @@
+import { GeometryObject, GeometryCollection } from "geojson"
+
+
 export interface SDGRow {
   country_code: string;
   country: string;
@@ -21,3 +24,26 @@ export interface SDGRow {
   goal_16_score: number;
   goal_17_score: number;
 }
+
+export interface Topology {
+  type: "Topology";
+  objects: Objects;
+  arcs: Array<Array<number[]>>;
+  transform: Transform;
+}
+
+export interface Transform {
+  scale: [number, number];
+  translate: [number, number];
+}
+
+export interface Objects {
+  countries: Countries;
+  land: Land;
+  [id: string]: any;
+}
+
+export type Countries = GeometryCollection<GeometryObject & { name: string } & any>
+
+
+export type Land = GeometryCollection;
