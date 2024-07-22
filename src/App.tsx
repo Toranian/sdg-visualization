@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getCSVFile } from "./utils";
+import { SDGRow } from "./types";
 
 function App() {
+  const [data, setData] = useState<SDGRow[]>([]);
+
   const getData = async () => {
-    const { data } = await getCSVFile();
-    console.log(data);
+    const { data: csvData } = await getCSVFile();
+    setData(csvData);
   };
 
   useEffect(() => {
@@ -12,9 +15,21 @@ function App() {
   }, []);
 
   return (
-    <>
-      <h1 className="text-2xl">SDG Visualization</h1>
-    </>
+    <div>
+      <h2>CSV Data</h2>
+
+      {data.length === 0 && <h1>Loading data...</h1>}
+
+      {data.length > 0 && (
+        <div>
+          {data.slice(0, 5).map((row: SDGRow, index) => (
+            <div key={index} className="flex flex-row">
+              {row.year}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
