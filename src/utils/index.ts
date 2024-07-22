@@ -1,11 +1,12 @@
 import { SDGRow } from "../types";
 import Papa, { ParseResult } from "papaparse";
+import dataCsvUrl from "./data.csv?url"
 
 export async function getCSVFile() {
   let data: SDGRow[] = [];
   let error: string | null = null;
 
-  await fetch("/data.csv")
+  await fetch(dataCsvUrl)
     .then((response) => response.text())
     .then((csvText) => {
       Papa.parse<SDGRow>(csvText, {
