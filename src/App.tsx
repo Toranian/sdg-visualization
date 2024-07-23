@@ -136,8 +136,6 @@ function SvgMap({ topology, year, sdgRows }: SVGMapProps) {
     return fs.flat(1);
   }, [countries, sdg, hoveredName]);
 
-  console.log(countries.features.length, features.length);
-
   return (
     <svg
       className="absolute"
@@ -145,8 +143,17 @@ function SvgMap({ topology, year, sdgRows }: SVGMapProps) {
       height={height}
       viewBox={`0 0 ${width} ${height}`}
     >
-      <rect width={"100%"} height={"100%"} fill={"#b5e2ff"} />
-      <path d={landPath} fill={"#BBBBBB"}></path>
+      <rect
+        width={"100%"}
+        height={"100%"}
+        fill={"#b5e2ff"}
+        onMouseOver={() => setHovered(undefined)}
+      />
+      <path
+        d={landPath}
+        fill={"#BBBBBB"}
+        onMouseOver={() => setHovered(undefined)}
+      ></path>
       <g>
         {features.map((f) => {
           const name =
@@ -182,9 +189,6 @@ function App() {
 
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
-
-  console.log("data", data);
-  console.log("countries", topology);
 
   const getData = async () => {
     const { data: csvData } = await getCSVFile();
