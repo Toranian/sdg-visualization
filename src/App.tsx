@@ -43,9 +43,17 @@ function translateName(geoName: string): string | undefined {
 
 type SDGScores = Omit<SDGRow, "year" | "country" | "country_code">;
 
+function partition<T>(array: T[], isValid: (x: T) => boolean): [T[], T[]] {
+  return array.reduce<[T[], T[]]>(
+    ([pass, fail], elem) => {
+      return isValid(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
+    },
+    [[], []],
+  );
+}
+
 function SvgMap({ topology, sdgRows }: SVGMapProps) {
   const sdg = useMemo(() => {
-    // const names = new Set<string>();
     const perYear: {
       [year: number]: { [country: string]: SDGScores };
     } = {};
@@ -64,6 +72,8 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
   // TODO: set year via slider
   const [year, _setYear] = useState(2022);
 
+  const [hoveredName, setHovered] = useState<string | undefined>(undefined);
+
   const [width, setWidth] = useState(window.innerWidth);
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -76,15 +86,60 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
     () => window.removeEventListener("resize", resizeMap);
   }, []);
 
-  const countries = topojson.feature(topology, topology.objects.countries);
+  const countries = useMemo(
+    () => topojson.feature(topology, topology.objects.countries),
+    [topology],
+  );
 
-  const color = d3.scaleSequential([0, 100], d3.interpolateYlGnBu);
+  const land = useMemo(
+    // @ts-ignore
+    () => topojson.feature(topology, topology.objects.land),
+    [topology],
+  );
 
-  const projection = d3
-    .geoNaturalEarth1()
-    .rotate([-10, 0]) // don't let Russia wrap
-    .fitSize([width, height], { type: "Sphere" });
-  const path = d3.geoPath(projection);
+  const color = useMemo(
+    () => d3.scaleSequential([0, 100], d3.interpolateYlGn),
+    [],
+  );
+
+  const path = useMemo(() => {
+    const projection = d3
+      .geoNaturalEarth1()
+      .rotate([-10, 0]) // don't let Russia wrap
+      .fitSize([width, height], { type: "Sphere" });
+    return d3.geoPath(projection);
+  }, [width, height]);
+
+  const countryPaths = useMemo(() => {
+    const d: { [key: string]: string | undefined } = {};
+    for (const f of countries.features) {
+      const name =
+        sdg[year][f.properties!.name] !== undefined
+          ? f.properties!.name
+          : translateName(f.properties!.name);
+      const pathString = path(f);
+      if (name && pathString) {
+        d[name] = pathString;
+      }
+    }
+    return d;
+  }, [path, sdg, countries]);
+
+  const landPath = useMemo(() => path(land) ?? undefined, [path, land]);
+
+  const features = useMemo(() => {
+    const fs = partition(countries.features, (f) => {
+      const name =
+        sdg[year][f.properties!.name] !== undefined
+          ? f.properties!.name
+          : translateName(f.properties!.name);
+      return name !== undefined && name === hoveredName;
+    });
+    fs.reverse();
+    return fs.flat(1);
+  }, [countries, sdg, hoveredName]);
+
+  console.log(countries.features.length, features.length);
 
   return (
     <svg
@@ -93,8 +148,10 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
       height={height}
       viewBox={`0 0 ${width} ${height}`}
     >
+      <rect width={"100%"} height={"100%"} fill={"#b5e2ff"} />
+      <path d={landPath} fill={"#BBBBBB"}></path>
       <g>
-        {countries.features.map((f) => {
+        {features.map((f) => {
           const name =
             sdg[year][f.properties!.name] !== undefined
               ? f.properties!.name
@@ -103,7 +160,20 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
             name === undefined
               ? "#828282"
               : color(sdg[year][name].sdg_index_score);
-          return <path d={path(f) ?? undefined} fill={fillColor}></path>;
+
+          const hovered = name !== undefined && name === hoveredName;
+
+          return (
+            <path
+              d={countryPaths[name]}
+              paintOrder={"stroke"}
+              stroke={hovered ? "#FFFFFF" : "#000000"}
+              strokeWidth={hovered ? "2px" : "1px"}
+              fill={fillColor}
+              onMouseOver={() => setHovered(name)}
+              onMouseOut={() => setHovered((n) => (n === name ? undefined : n))}
+            ></path>
+          );
         })}
       </g>
     </svg>
