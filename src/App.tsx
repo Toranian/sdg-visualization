@@ -8,6 +8,7 @@ import countriesURL from "./countries-50m.json?url";
 type SVGMapProps = {
   topology: Topology;
   sdgRows: SDGRow[];
+  year: number;
 };
 
 function translateName(geoName: string): string | undefined {
@@ -52,7 +53,7 @@ function partition<T>(array: T[], isValid: (x: T) => boolean): [T[], T[]] {
   );
 }
 
-function SvgMap({ topology, sdgRows }: SVGMapProps) {
+function SvgMap({ topology, year, sdgRows }: SVGMapProps) {
   const sdg = useMemo(() => {
     const perYear: {
       [year: number]: { [country: string]: SDGScores };
@@ -67,10 +68,6 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
     }
     return perYear;
   }, [sdgRows]);
-
-  // range 2000-2022
-  // TODO: set year via slider
-  const [year, _setYear] = useState(2022);
 
   const [hoveredName, setHovered] = useState<string | undefined>(undefined);
 
@@ -181,6 +178,8 @@ function SvgMap({ topology, sdgRows }: SVGMapProps) {
 }
 
 function App() {
+  const [year, setYear] = useState(2022);
+
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
 
@@ -204,7 +203,29 @@ function App() {
 
   return (
     <div className="w-max h-[100svh]">
-      {topology && <SvgMap sdgRows={data} topology={topology} />}
+      <div className="absolute bottom-10 left-10 z-10 p-3 rounded-lg bg-white flex flex-row gap-3">
+        <label htmlFor="yearinput" className="font-bold">
+          Year:
+        </label>
+        <span>{year}</span>
+        <input
+          id="yearinput"
+          type="range"
+          min="2000"
+          max="2022"
+          defaultValue="2022"
+          list="yearvalues"
+          onInput={(e) => setYear(parseInt(e.currentTarget.value))}
+        />
+        <datalist className="text-white bg-white" id="yearvalues">
+          {[...Array(23).keys()].map((_, i) => (
+            <option value={2000 + i} label={(2000 + i).toString()} />
+          ))}
+        </datalist>
+      </div>
+
+      {topology && <SvgMap sdgRows={data} topology={topology} year={year} />}
+
       <h2>CSV Data</h2>
 
       {data.length === 0 && <h1>Loading data...</h1>}
