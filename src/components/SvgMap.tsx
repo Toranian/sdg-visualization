@@ -7,6 +7,7 @@ type SVGMapProps = {
   topology: Topology;
   sdgRows: SDGRow[];
   year: number;
+  goal: keyof SDGScores;
 };
 
 function translateName(geoName: string): string | undefined {
@@ -51,7 +52,7 @@ function partition<T>(array: T[], isValid: (x: T) => boolean): [T[], T[]] {
   );
 }
 
-export function SvgMap({ topology, year, sdgRows }: SVGMapProps) {
+export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
   const sdg = useMemo(() => {
     const perYear: {
       [year: number]: { [country: string]: SDGScores };
@@ -159,9 +160,7 @@ export function SvgMap({ topology, year, sdgRows }: SVGMapProps) {
               ? f.properties!.name
               : translateName(f.properties!.name);
           const fillColor =
-            name === undefined
-              ? "#828282"
-              : color(sdg[year][name].sdg_index_score);
+            name === undefined ? "#828282" : color(sdg[year][name][goal]);
 
           const hovered = name !== undefined && name === hoveredName;
 
