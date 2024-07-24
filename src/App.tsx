@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import { getCSVFile } from "./utils";
-import { SDGRow, Topology } from "./types";
+import { SDGCol, SDGRow, Topology } from "./types";
 import countriesURL from "./countries-50m.json?url";
 import { SvgMap } from "./components/SvgMap";
+import Scatter from "./components/Scatter";
+
+enum DisplayMode {
+  Map,
+  Chart,
+  Scatter,
+}
 
 function App() {
   const [year, setYear] = useState(2022);
-
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.Map);
 
   const getData = async () => {
     const { data: csvData } = await getCSVFile();
@@ -27,30 +34,51 @@ function App() {
 
   return (
     <div className="w-max h-[100svh]">
-      <div className="absolute bottom-10 left-10 z-10 p-3 rounded-lg bg-white flex flex-row gap-3">
-        <label htmlFor="yearinput" className="font-bold">
-          Year:
-        </label>
-        <span>{year}</span>
-        <input
-          id="yearinput"
-          type="range"
-          min="2000"
-          max="2022"
-          defaultValue="2022"
-          list="yearvalues"
-          onInput={(e) => setYear(parseInt(e.currentTarget.value))}
-        />
-        <datalist className="text-white bg-white" id="yearvalues">
-          {[...Array(23).keys()].map((_, i) => (
-            <option value={2000 + i} label={(2000 + i).toString()} />
-          ))}
-        </datalist>
+      <div className="flex flex-row gap-2">
+        <button className="" onClick={() => setDisplayMode(DisplayMode.Map)}>
+          Map
+        </button>
+        <button onClick={() => setDisplayMode(DisplayMode.Scatter)}>
+          Scatter
+        </button>
+        <button onClick={() => setDisplayMode(DisplayMode.Chart)}>Chart</button>
       </div>
 
-      {topology && <SvgMap sdgRows={data} topology={topology} year={year} />}
+      {displayMode === DisplayMode.Map && (
+        <>
+          <div className="absolute bottom-10 left-10 z-10 p-3 rounded-lg bg-white flex flex-row gap-3">
+            <label htmlFor="yearinput" className="font-bold">
+              Year:
+            </label>
+            <span>{year}</span>
+            <input
+              id="yearinput"
+              type="range"
+              min="2000"
+              max="2022"
+              defaultValue="2022"
+              list="yearvalues"
+              onInput={(e) => setYear(parseInt(e.currentTarget.value))}
+            />
+            <datalist className="text-white bg-white" id="yearvalues">
+              {[...Array(23).keys()].map((_, i) => (
+                <option value={2000 + i} label={(2000 + i).toString()} />
+              ))}
+            </datalist>
+          </div>
 
-      <h2>CSV Data</h2>
+          {topology && (
+            <SvgMap sdgRows={data} topology={topology} year={year} />
+          )}
+        </>
+      )}
+
+      {displayMode === DisplayMode.Scatter && (
+        <Scatter
+          data={data}
+          cols={[SDGCol.GOAL_1_SCORE, SDGCol.GOAL_4_SCORE]}
+        />
+      )}
 
       {data.length === 0 && <h1>Loading data...</h1>}
 
