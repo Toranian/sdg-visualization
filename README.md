@@ -1,3 +1,7 @@
+# Project Details
+View live at https://toranian.github.io/sdg-visualization/
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
