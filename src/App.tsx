@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCSVFile } from "./utils";
 import { SDGCol, SDGRow, Topology } from "./types";
 import countriesURL from "./countries-50m.json?url";
 import { SvgMap } from "./components/SvgMap";
 import Scatter from "./components/Scatter";
+import { Legend } from "./components/Legend";
+import * as d3 from "d3";
 
 enum DisplayMode {
   Map,
@@ -33,6 +35,13 @@ function App() {
     getData();
     getTopology();
   }, []);
+
+  // const legendRef = useRef<SVGSVGElement | null>(null);
+  //
+  // useEffect(() => {
+  //   legendRef.current = Legend(
+  //   );
+  // }, []);
 
   return (
     <div className="w-max h-[100svh]">
@@ -117,6 +126,12 @@ function App() {
                 </option>
               </select>
             </div>
+
+            {/* @ts-ignore */}
+            <Legend
+              color={d3.scaleSequential([0, 100], d3.interpolateYlGn) as any}
+              title="SDG Goal Progress"
+            />
           </div>
 
           {topology && (
