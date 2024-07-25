@@ -34,13 +34,6 @@ function App() {
     getTopology();
   }, []);
 
-  // const legendRef = useRef<SVGSVGElement | null>(null);
-  //
-  // useEffect(() => {
-  //   legendRef.current = Legend(
-  //   );
-  // }, []);
-
   return (
     <div className="w-max h-[100svh]">
       <div className="flex flex-row gap-2">
