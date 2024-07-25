@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { SDGCol, SDGRow, Topology } from "../types";
 import * as d3 from "d3";
 import { SvgMap } from "./SvgMap";
+import { Legend } from "./Legend";
 
 type SDGMapProps = {
   year: number;
