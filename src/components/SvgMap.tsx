@@ -163,7 +163,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
         })}
       </g>
     ),
-    [year, goal, height, width],
+    [height, width],
   );
 
   let svgRef = useRef<SVGSVGElement>(null);
@@ -174,6 +174,12 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
     for (const element of svg.querySelectorAll("path[data-country-name]")) {
       const path = element as SVGPathElement;
       const name = element.getAttribute("data-country-name");
+      if (!name) continue;
+
+      const fillColor =
+        name === undefined ? "#828282" : color(sdg[year][name][goal]);
+
+      path.style.fill = fillColor;
     }
   }, [year, goal, color, sdg]);
 
