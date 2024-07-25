@@ -69,6 +69,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
   }, [sdgRows]);
 
   const [hovered, setHovered] = useState<string | undefined>(undefined);
+  const hoveredRef = useRef<SVGPathElement | null>(null);
 
   const [width, setWidth] = useState(window.innerWidth);
   const [height, setHeight] = useState(window.innerHeight);
@@ -137,54 +138,89 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
 
   const tooltipRef = useRef<HTMLDivElement>(null);
 
+  const mapPaths = useMemo(
+    () => (
+      <g>
+        {features.map((f) => {
+          const name =
+            sdg[year][f.properties!.name] !== undefined
+              ? f.properties!.name
+              : translateName(f.properties!.name);
+          const fillColor =
+            name === undefined ? "#828282" : color(sdg[year][name][goal]);
+
+          return (
+            <path
+              data-country-name={name}
+              d={countryPaths[name]}
+              paintOrder="stroke"
+              stroke="#000000"
+              strokeWidth="1px"
+              fill={fillColor}
+              onClick={() => console.log("clicked on", name)}
+            ></path>
+          );
+        })}
+      </g>
+    ),
+    [year, goal, height, width],
+  );
+
+  let svgRef = useRef<SVGSVGElement>(null);
+
   useEffect(() => {
-    function updateCoords(e: MouseEvent) {
+    let svg = svgRef.current;
+    if (!svg) return;
+    for (const element of svg.querySelectorAll("path[data-country-name]")) {
+      const path = element as SVGPathElement;
+      const name = element.getAttribute("data-country-name");
+    }
+  }, [year, goal, color, sdg]);
+
+  // update map styling imperatively for performance reasons
+  useEffect(() => {
+    function updateHover(e: MouseEvent) {
       const tooltip = tooltipRef.current;
       if (!tooltip) return;
-      tooltip.style.left = `${e.x}px`;
-      tooltip.style.top = `${e.y}px`;
+
+      let rect = tooltip.getBoundingClientRect();
+      tooltip.style.left = `${e.x - rect.width / 2}px`;
+      tooltip.style.top = `${e.y - rect.height}px`;
 
       for (const element of document.elementsFromPoint(e.x, e.y)) {
+        const svg = element as SVGPathElement;
         const name = element.getAttribute("data-country-name");
         if (name) {
+          d3.select(svg).raise();
           setHovered(name);
           tooltip.style.opacity = "1";
+          svg.style.stroke = "#FFFFFF";
+          svg.style.strokeWidth = "2px";
+          const oldSvg = hoveredRef.current;
+          if (oldSvg && svg != oldSvg) {
+            // @ts-ignore
+            oldSvg.style.stroke = null;
+            // @ts-ignore
+            oldSvg.style.strokeWidth = null;
+          }
+          hoveredRef.current = svg;
           return;
         }
       }
       setHovered(undefined);
       tooltip.style.opacity = "0";
+
+      const oldSvg = hoveredRef.current;
+      if (oldSvg) {
+        // @ts-ignore
+        oldSvg.style.stroke = null;
+        // @ts-ignore
+        oldSvg.style.strokeWidth = null;
+      }
     }
-    window.addEventListener("mousemove", updateCoords);
-    return () => window.removeEventListener("mousemove", updateCoords);
-  }, [hovered, tooltipRef]);
-
-  const mapPaths = (
-    <g>
-      {features.map((f) => {
-        const name =
-          sdg[year][f.properties!.name] !== undefined
-            ? f.properties!.name
-            : translateName(f.properties!.name);
-        const fillColor =
-          name === undefined ? "#828282" : color(sdg[year][name][goal]);
-
-        const isHovered = name !== undefined && name === hovered;
-
-        return (
-          <path
-            data-country-name={name}
-            d={countryPaths[name]}
-            paintOrder={"stroke"}
-            stroke={isHovered ? "#FFFFFF" : "#000000"}
-            strokeWidth={isHovered ? "2px" : "1px"}
-            fill={fillColor}
-            onClick={() => console.log("clicked on", name)}
-          ></path>
-        );
-      })}
-    </g>
-  );
+    window.addEventListener("mousemove", updateHover);
+    return () => window.removeEventListener("mousemove", updateHover);
+  }, [hovered, tooltipRef, mapPaths]);
 
   return (
     <>
@@ -204,6 +240,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
         width={width}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
+        ref={svgRef}
       >
         <rect
           width={"100%"}
