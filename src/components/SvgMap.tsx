@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SDGRow, Topology } from "../types";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
@@ -68,7 +68,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
     return perYear;
   }, [sdgRows]);
 
-  const [hoveredName, setHovered] = useState<string | undefined>(undefined);
+  const [hovered, setHovered] = useState<string | undefined>(undefined);
 
   const [width, setWidth] = useState(window.innerWidth);
   const [height, setHeight] = useState(window.innerHeight);
@@ -129,54 +129,95 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
         sdg[year][f.properties!.name] !== undefined
           ? f.properties!.name
           : translateName(f.properties!.name);
-      return name !== undefined && name === hoveredName;
+      return name !== undefined && name === hovered;
     });
     fs.reverse();
     return fs.flat(1);
-  }, [countries, sdg, hoveredName]);
+  }, [countries, sdg, hovered]);
+
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function updateCoords(e: MouseEvent) {
+      const tooltip = tooltipRef.current;
+      if (!tooltip) return;
+      tooltip.style.left = `${e.x}px`;
+      tooltip.style.top = `${e.y}px`;
+
+      for (const element of document.elementsFromPoint(e.x, e.y)) {
+        const name = element.getAttribute("data-country-name");
+        if (name) {
+          setHovered(name);
+          tooltip.style.opacity = "1";
+          return;
+        }
+      }
+      setHovered(undefined);
+      tooltip.style.opacity = "0";
+    }
+    window.addEventListener("mousemove", updateCoords);
+    return () => window.removeEventListener("mousemove", updateCoords);
+  }, [hovered, tooltipRef]);
+
+  const mapPaths = (
+    <g>
+      {features.map((f) => {
+        const name =
+          sdg[year][f.properties!.name] !== undefined
+            ? f.properties!.name
+            : translateName(f.properties!.name);
+        const fillColor =
+          name === undefined ? "#828282" : color(sdg[year][name][goal]);
+
+        const isHovered = name !== undefined && name === hovered;
+
+        return (
+          <path
+            data-country-name={name}
+            d={countryPaths[name]}
+            paintOrder={"stroke"}
+            stroke={isHovered ? "#FFFFFF" : "#000000"}
+            strokeWidth={isHovered ? "2px" : "1px"}
+            fill={fillColor}
+            onClick={() => console.log("clicked on", name)}
+          ></path>
+        );
+      })}
+    </g>
+  );
 
   return (
-    <svg
-      className="absolute"
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-    >
-      <rect
-        width={"100%"}
-        height={"100%"}
-        fill={"#b5e2ff"}
-        onMouseOver={() => setHovered(undefined)}
-      />
-      <path
-        d={landPath}
-        fill={"#BBBBBB"}
-        onMouseOver={() => setHovered(undefined)}
-      ></path>
-      <g>
-        {features.map((f) => {
-          const name =
-            sdg[year][f.properties!.name] !== undefined
-              ? f.properties!.name
-              : translateName(f.properties!.name);
-          const fillColor =
-            name === undefined ? "#828282" : color(sdg[year][name][goal]);
-
-          const hovered = name !== undefined && name === hoveredName;
-
-          return (
-            <path
-              d={countryPaths[name]}
-              paintOrder={"stroke"}
-              stroke={hovered ? "#FFFFFF" : "#000000"}
-              strokeWidth={hovered ? "2px" : "1px"}
-              fill={fillColor}
-              onMouseOver={() => setHovered(name)}
-              onMouseOut={() => setHovered((n) => (n === name ? undefined : n))}
-            ></path>
-          );
-        })}
-      </g>
-    </svg>
+    <>
+      <div
+        className="z-20 absolute opacity-0 bg-black bg-opacity-80 text-white select-none pointer-events-none text-sm p-1 rounded-md"
+        ref={tooltipRef}
+      >
+        {hovered && (
+          <>
+            <p className="font-bold">{hovered}</p>
+            <p>{sdg[year][hovered][goal]}</p>
+          </>
+        )}
+      </div>
+      <svg
+        className="absolute"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <rect
+          width={"100%"}
+          height={"100%"}
+          fill={"#b5e2ff"}
+          onMouseOver={() => setHovered(undefined)}
+        />
+        <path
+          d={landPath}
+          fill={"#BBBBBB"}
+          onMouseOver={() => setHovered(undefined)}
+        ></path>
+        {mapPaths}
+      </svg>
+    </>
   );
 }
