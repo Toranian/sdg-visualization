@@ -28,12 +28,8 @@ export default function Scatter({
 }: ScatterProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const countries = Array.from(
-    new Set(data.slice(0, 100).map((row: SDGRow) => row[SDGCol.COUNTRY])),
-  ).sort((a, b) => a.localeCompare(b));
-
   // Get the data for the selected columns.
-  const filteredData = data.slice(0, 100).map((row) => {
+  const filteredData = data.map((row) => {
     const newRow: any = {};
     cols.forEach((col: SDGCol, index: number) => {
       if (
@@ -52,8 +48,8 @@ export default function Scatter({
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
-    const width = 500;
-    const height = 500;
+    const width = window.innerWidth / 2.5;
+    const height = window.innerWidth / 2.5;
     const margin = { top: 20, right: 30, bottom: 40, left: 30 };
 
     svg
@@ -87,7 +83,7 @@ export default function Scatter({
 
     var color = d3
       .scaleOrdinal()
-      .domain(countries)
+      .domain(selectedCountries || [])
       .range([
         "#F8766D80",
         "#00BA3880",
@@ -116,13 +112,15 @@ export default function Scatter({
       .append("circle")
       .attr("cx", (d) => xScale(d[0]))
       .attr("cy", (d) => yScale(d[1]))
-      .attr("r", 3)
+      .attr("r", 5)
       // @ts-ignore
       .attr("fill", (d) => color(d["country"]))
       .on("mouseover", (event, d) => {
         tooltip.transition().duration(100).style("opacity", 0.9);
         tooltip
-          .html(`${d["country"]}<br/>X: ${d[0]}<br/>Y: ${d[1]}`) // Customize this line to show the data you want
+          .html(
+            `${d["country"]}<br/>${SDGColDescriptions[cols[0]]}: ${d[0]}<br/>${SDGColDescriptions[cols[1]]}: ${d[1]}`,
+          ) // Customize this line to show the data you want
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 28 + "px");
       })
@@ -146,11 +144,11 @@ export default function Scatter({
       .attr("y", -margin.left + 10)
       .attr("x", -margin.top - height / 2 + 20)
       .text(SDGColDescriptions[cols[1]]);
-  }, [data]);
+  }, [data, window.innerWidth]);
 
   return (
     <div className="flex items-center justify-center flex-col gap-2 px-[100px]">
-      <h2 className="text-lg font-semibold">
+      <h2 className="text-2xl font-semibold">
         {SDGColDescriptions[cols[0]]} vs {SDGColDescriptions[cols[1]]}
       </h2>
       <svg ref={svgRef} id="scatter"></svg>
