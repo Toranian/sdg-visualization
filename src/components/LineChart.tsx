@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { SDGCol, SDGColDescriptions, SDGRow } from "../types";
 import * as d3 from "d3";
 
@@ -63,6 +63,8 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
     svg
       .append("g")
       .attr("transform", `translate(0, ${height})`)
+      // FIXME: ISAAAAC
+      // @ts-ignore
       .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%Y")));
 
     svg.append("g").call(d3.axisLeft(y));
@@ -142,7 +144,7 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         .attr("stroke-width", 12)
         .attr("d", line as any) // Cast line to any to avoid TypeScript error
 
-        .on("mouseover", function(event) {
+        .on("mouseover", function (event) {
           const [xPos, _] = d3.pointer(event);
           const x0 = x.invert(xPos);
 
