@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getCSVFile } from "./utils";
 import { SDGCol, SDGRow, Topology } from "./types";
 import countriesURL from "./countries-50m.json?url";
 import { SvgMap } from "./components/SvgMap";
-import Scatter from "./components/Scatter";
 import { Legend } from "./components/Legend";
 import * as d3 from "d3";
+import ScatterPage from "./pages/ScatterPage";
 
 enum DisplayMode {
   Map,
@@ -19,7 +19,9 @@ function App() {
 
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
-  const [displayMode, setDisplayMode] = useState<DisplayMode>(DisplayMode.Map);
+  const [displayMode, setDisplayMode] = useState<DisplayMode>(
+    DisplayMode.Scatter,
+  );
 
   const getData = async () => {
     const { data: csvData } = await getCSVFile();
@@ -35,13 +37,6 @@ function App() {
     getData();
     getTopology();
   }, []);
-
-  // const legendRef = useRef<SVGSVGElement | null>(null);
-  //
-  // useEffect(() => {
-  //   legendRef.current = Legend(
-  //   );
-  // }, []);
 
   return (
     <div className="w-max h-[100svh]">
@@ -106,7 +101,7 @@ function App() {
                   8. Decent Work and Economic Growth
                 </option>
                 <option value="goal_9_score">
-                  9. Industry, Innovation, and Infrastrucure
+                  9. Industry, Innovation, and Infrastructure
                 </option>
                 <option value="goal_10_score">10. Reduced Inequalities</option>
                 <option value="goal_11_score">
@@ -145,24 +140,9 @@ function App() {
         </>
       )}
 
-      {displayMode === DisplayMode.Scatter && (
-        <Scatter
-          data={data}
-          cols={[SDGCol.GOAL_1_SCORE, SDGCol.GOAL_4_SCORE]}
-        />
-      )}
+      {displayMode === DisplayMode.Scatter && <ScatterPage data={data} />}
 
       {data.length === 0 && <h1>Loading data...</h1>}
-
-      {data.length > 0 && (
-        <div>
-          {data.slice(0, 5).map((row: SDGRow, index) => (
-            <div key={index} className="flex flex-row">
-              {row.year}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
