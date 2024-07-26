@@ -88,12 +88,6 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
     [topology],
   );
 
-  const land = useMemo(
-    // @ts-ignore
-    () => topojson.feature(topology, topology.objects.land),
-    [topology],
-  );
-
   const color = useMemo(
     () => d3.scaleSequential([0, 100], d3.interpolateYlGn),
     [],
@@ -110,10 +104,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
   const countryPaths = useMemo(() => {
     const d: { [key: string]: string | undefined } = {};
     for (const f of countries.features) {
-      const name =
-        sdg[year][f.properties!.name] !== undefined
-          ? f.properties!.name
-          : translateName(f.properties!.name);
+      const name = f.properties!.name;
       const pathString = path(f);
       if (name && pathString) {
         d[name] = pathString;
@@ -121,8 +112,6 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
     }
     return d;
   }, [path, sdg, countries]);
-
-  const landPath = useMemo(() => path(land) ?? undefined, [path, land]);
 
   const features = useMemo(() => {
     const fs = partition(countries.features, (f) => {
@@ -147,12 +136,13 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
               ? f.properties!.name
               : translateName(f.properties!.name);
           const fillColor =
-            name === undefined ? "#828282" : color(sdg[year][name][goal]);
+            name === undefined ? "#BBBBBB" : color(sdg[year][name][goal]);
 
           return (
             <path
-              data-country-name={name}
-              d={countryPaths[name]}
+              key={f.properties!.name}
+              data-country-name={name ?? f.properties!.name}
+              d={countryPaths[f.properties!.name]}
               paintOrder="stroke"
               stroke="#000000"
               strokeWidth="1px"
@@ -176,8 +166,9 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
       const name = element.getAttribute("data-country-name");
       if (!name) continue;
 
-      const fillColor =
-        name === undefined ? "#828282" : color(sdg[year][name][goal]);
+      const fillColor = sdg[year][name]
+        ? color(sdg[year][name][goal])
+        : "#BBBBBB";
 
       path.style.fill = fillColor;
     }
@@ -237,7 +228,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
         {hovered && (
           <>
             <p className="font-bold">{hovered}</p>
-            <p>{sdg[year][hovered][goal]}</p>
+            <p>{sdg[year][hovered] ? sdg[year][hovered][goal] : "N/A"}</p>
           </>
         )}
       </div>
@@ -254,11 +245,6 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
           fill={"#b5e2ff"}
           onMouseOver={() => setHovered(undefined)}
         />
-        <path
-          d={landPath}
-          fill={"#BBBBBB"}
-          onMouseOver={() => setHovered(undefined)}
-        ></path>
         {mapPaths}
       </svg>
     </>

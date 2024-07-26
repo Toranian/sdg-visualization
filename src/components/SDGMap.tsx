@@ -38,7 +38,7 @@ export function SDGMap({
       />
       <datalist className="text-white bg-white" id="yearvalues">
         {[...Array(23).keys()].map((_, i) => (
-          <option value={2000 + i} label={(2000 + i).toString()} />
+          <option key={i} value={2000 + i} label={(2000 + i).toString()} />
         ))}
       </datalist>
     </div>
