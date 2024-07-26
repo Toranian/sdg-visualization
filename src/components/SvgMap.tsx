@@ -127,9 +127,17 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
 
   const tooltipRef = useRef<HTMLDivElement>(null);
 
+  const gRef = useRef<SVGGElement>(null);
+
   const mapPaths = useMemo(
     () => (
-      <g>
+      <g ref={gRef} width="100%" height="100%">
+        <rect
+          width={"100%"}
+          height={"100%"}
+          fillOpacity={0}
+          onMouseOver={() => setHovered(undefined)}
+        />
         {features.map((f) => {
           const name =
             sdg[year][f.properties!.name] !== undefined
@@ -155,6 +163,21 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
     ),
     [height, width],
   );
+
+  useEffect(() => {
+    if (!gRef.current) return;
+
+    const pathGroup = d3.select(gRef.current);
+    const zoom = d3
+      .zoom<SVGGElement, unknown>()
+      .scaleExtent([1, 8])
+      .on("zoom", ({ transform }) => {
+        pathGroup.attr("transform", transform);
+        setHovered(undefined);
+      });
+    // @ts-ignore
+    pathGroup.call(zoom);
+  }, [gRef.current, width, height]);
 
   let svgRef = useRef<SVGSVGElement>(null);
 
@@ -239,12 +262,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
         viewBox={`0 0 ${width} ${height}`}
         ref={svgRef}
       >
-        <rect
-          width={"100%"}
-          height={"100%"}
-          fill={"#b5e2ff"}
-          onMouseOver={() => setHovered(undefined)}
-        />
+        <rect width={"100%"} height={"100%"} fill={"#b5e2ff"} />
         {mapPaths}
       </svg>
     </>
