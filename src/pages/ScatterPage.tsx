@@ -24,12 +24,12 @@ export default function ScatterPage({ data }: ScatterPageProps) {
     "#0fee0580",
   ];
 
-  useEffect(() => {
-    console.log(selectedCountries);
-  }, [selectedCountries, goalOne]);
+  // useEffect(() => {
+  //   console.log(selectedCountries);
+  // }, [selectedCountries, goalOne]);
 
   return (
-    <div className="w-screen h-full grid flex flex-col md:grid-cols-4">
+    <div className="w-screen h-screen grid flex flex-col md:grid-cols-4">
       {/* Left side with scatter plot*/}
       <div className="md:col-span-3 h-full w-full flex justify-center items-center">
         {goalOne && goalTwo && selectedCountries.length > 0 ? (

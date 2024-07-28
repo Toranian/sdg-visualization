@@ -38,7 +38,7 @@ function App() {
   }, []);
 
   return (
-    <div className="w-max h-[100svh]">
+    <div className="max-w-screen max-h-screen overflow-hidden">
       <div className="flex flex-row gap-2 z-[1000] fixed top-0 left-0 p-3">
         <button className="" onClick={() => setDisplayMode(DisplayMode.Map)}>
           Map

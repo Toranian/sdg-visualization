@@ -60,12 +60,12 @@ export default function Scatter({
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(filteredData, (d) => d[0])])
+      .domain([0, 100])
       .range([margin.left, width]);
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(filteredData, (d) => d[1])])
+      .domain([0, 100])
       .range([height - margin.bottom, margin.top]);
 
     const xAxis = d3.axisBottom(xScale);
@@ -119,7 +119,7 @@ export default function Scatter({
         tooltip.transition().duration(100).style("opacity", 0.9);
         tooltip
           .html(
-            `${d["country"]}<br/>${SDGColDescriptions[cols[0]]}: ${d[0]}<br/>${SDGColDescriptions[cols[1]]}: ${d[1]}`,
+            `<strong>${d["country"]}</strong><br/>${SDGColDescriptions[cols[0]]}: ${d[0]}<br/>${SDGColDescriptions[cols[1]]}: ${d[1]}`,
           ) // Customize this line to show the data you want
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 28 + "px");
