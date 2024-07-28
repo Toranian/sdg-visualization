@@ -29,22 +29,24 @@ export default function Scatter({
   const svgRef = useRef<SVGSVGElement>(null);
 
   // Get the data for the selected columns.
-  const filteredData = data.map((row) => {
-    const newRow: any = {};
-    cols.forEach((col: SDGCol, index: number) => {
-      if (
-        selectedCountries &&
-        !selectedCountries.includes(row[SDGCol.COUNTRY])
-      ) {
-        return;
-      }
+  const filteredData = data
+    .map((row) => {
+      const newRow: any = {};
+      cols.forEach((col: SDGCol, index: number) => {
+        if (
+          selectedCountries &&
+          !selectedCountries.includes(row[SDGCol.COUNTRY])
+        ) {
+          return;
+        }
 
-      newRow[index] = row[col];
-      newRow["country"] = row[SDGCol.COUNTRY];
-      newRow["year"] = row[SDGCol.YEAR];
-    });
-    return newRow;
-  });
+        newRow[index] = row[col];
+        newRow["country"] = row[SDGCol.COUNTRY];
+        newRow["year"] = row[SDGCol.YEAR];
+      });
+      return newRow;
+    })
+    .filter((row) => row[0] !== undefined && row[1] !== undefined);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -113,10 +115,10 @@ export default function Scatter({
       .attr("cx", (d) => xScale(d[0]))
       .attr("cy", (d) => yScale(d[1]))
       .attr("r", (d) =>
-        year !== undefined && d["year"] === year.toString() ? 6 : 5,
+        year !== undefined && d["year"] === year.toString() ? 6 : 5
       )
       .attr("opacity", (d) =>
-        year === undefined ? 0.9 : d["year"] === year.toString() ? 1 : 0.1,
+        year === undefined ? 0.9 : d["year"] === year.toString() ? 1 : 0.1
       )
       // @ts-ignore
       .attr("fill", (d) => color(d["country"]))
@@ -124,7 +126,9 @@ export default function Scatter({
         tooltip.transition().duration(100).style("opacity", 0.9);
         tooltip
           .html(
-            `<strong>${d["country"]}</strong><br/>${SDGColDescriptions[cols[0]]}: ${d[0]}<br/>${SDGColDescriptions[cols[1]]}: ${d[1]}`,
+            `<strong>${d["country"]}</strong><br/>${
+              SDGColDescriptions[cols[0]]
+            }: ${d[0]}<br/>${SDGColDescriptions[cols[1]]}: ${d[1]}`
           ) // Customize this line to show the data you want
           .style("left", event.pageX + "px")
           .style("top", event.pageY - 28 + "px");

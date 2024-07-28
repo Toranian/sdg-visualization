@@ -193,7 +193,7 @@ export function SDGMap({
 
                   {additionalSDGs.map((asdg: SDGCol, index: number) => (
                     <div
-                      className="border-solid border px-3 py-2.5 rounded-lg flex flex-row justify-between items-center border-2"
+                      className="border-solid px-3 py-2.5 rounded-lg flex flex-row justify-between items-center border-2"
                       style={{ borderColor: colors[index] }}
                     >
                       {SDGColDescriptions[asdg]}
@@ -201,9 +201,7 @@ export function SDGMap({
                         className="text-red-600 cursor-pointer"
                         onClick={() => {
                           return setAdditionalSDGs(
-                            additionalSDGs.filter(
-                              (country) => country !== asdg,
-                            ),
+                            additionalSDGs.filter((country) => country !== asdg)
                           );
                         }}
                       >
