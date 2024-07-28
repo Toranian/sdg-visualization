@@ -189,6 +189,14 @@ export function SvgMap({
     const pathGroup = d3.select(gRef.current);
     const zoom = d3
       .zoom<SVGGElement, unknown>()
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .translateExtent([
+        [0, 0],
+        [width, height],
+      ])
       .scaleExtent([1, 8])
       .on("zoom", ({ transform }) => {
         pathGroup.attr("transform", transform);
@@ -196,6 +204,9 @@ export function SvgMap({
       });
     // @ts-ignore
     pathGroup.call(zoom);
+    () => {
+      pathGroup.on("zoom", null);
+    };
   }, [gRef.current, width, height]);
 
   let svgRef = useRef<SVGSVGElement>(null);
