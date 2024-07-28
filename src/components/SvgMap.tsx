@@ -210,6 +210,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
       for (const element of document.elementsFromPoint(e.x, e.y)) {
         const svg = element as SVGPathElement;
         const name = element.getAttribute("data-country-name");
+
         if (name) {
           d3.select(svg).raise();
           setHovered(name);

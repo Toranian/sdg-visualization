@@ -88,9 +88,9 @@ export default function Scatter({
         "#F8766D",
         "#00BA38",
         "#619CFF",
-        "#eeee00",
         "#ff00ff",
         "#0fee05",
+        "#eeee00",
       ]);
 
     const tooltip = d3

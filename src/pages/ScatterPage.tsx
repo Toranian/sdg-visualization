@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Scatter from "../components/Scatter";
 import { SDGCol, SDGRow } from "../types";
 
@@ -19,9 +19,9 @@ export default function ScatterPage({ data }: ScatterPageProps) {
     "#F8766D80",
     "#00BA3880",
     "#619CFF80",
-    "#eee020",
     "#ff00ff80",
     "#0fee0580",
+    "#eee020",
   ];
 
   // useEffect(() => {

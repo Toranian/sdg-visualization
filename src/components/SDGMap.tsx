@@ -65,7 +65,7 @@ export function SDGMap({
         <option value="goal_7_score">7. Affordable and Clean Energy</option>
         <option value="goal_8_score">8. Decent Work and Economic Growth</option>
         <option value="goal_9_score">
-          9. Industry, Innovation, and Infrastrucure
+          9. Industry, Innovation, and Infrastructure
         </option>
         <option value="goal_10_score">10. Reduced Inequalities</option>
         <option value="goal_11_score">

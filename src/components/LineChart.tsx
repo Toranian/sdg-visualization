@@ -63,9 +63,13 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
     svg
       .append("g")
       .attr("transform", `translate(0, ${height})`)
-      // FIXME: ISAAAAC
-      // @ts-ignore
-      .call(d3.axisBottom(x).tickFormat(d3.timeFormat("%Y")));
+      .call(
+        d3
+          .axisBottom(x)
+          .tickFormat((d: Date | d3.NumberValue, _: number) =>
+            d3.timeFormat("%Y")(d as Date),
+          ),
+      );
 
     svg.append("g").call(d3.axisLeft(y));
 
@@ -144,7 +148,7 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         .attr("stroke-width", 12)
         .attr("d", line as any) // Cast line to any to avoid TypeScript error
 
-        .on("mouseover", function (event) {
+        .on("mouseover", function(event) {
           const [xPos, _] = d3.pointer(event);
           const x0 = x.invert(xPos);
 
