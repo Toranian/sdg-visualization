@@ -15,6 +15,7 @@ enum DisplayMode {
 function App() {
   const [year, setYear] = useState(2022);
   const [goal, setGoal] = useState<SDGCol>(SDGCol.SDG_INDEX_SCORE);
+  const [secondYear, setSecondYear] = useState<number | null>(null);
 
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
@@ -56,7 +57,18 @@ function App() {
         </h2>
       </div>
       {displayMode === DisplayMode.Map && topology !== null && (
-        <SDGMap {...{ year, setYear, goal, setGoal, data, topology }} />
+        <SDGMap
+          {...{
+            year,
+            setYear,
+            goal,
+            setGoal,
+            data,
+            topology,
+            secondYear,
+            setSecondYear,
+          }}
+        />
       )}
 
       {displayMode === DisplayMode.Scatter && <ScatterPage data={data} />}

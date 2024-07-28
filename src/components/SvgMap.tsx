@@ -7,6 +7,7 @@ type SVGMapProps = {
   topology: Topology;
   sdgRows: SDGRow[];
   year: number;
+  secondYear: number | null;
   goal: keyof SDGScores;
   onClickHandler: (country: string) => void;
 };
@@ -56,10 +57,12 @@ function partition<T>(array: T[], isValid: (x: T) => boolean): [T[], T[]] {
 export function SvgMap({
   topology,
   year,
+  secondYear,
   goal,
   sdgRows,
   onClickHandler,
 }: SVGMapProps) {
+  console.log(secondYear);
   const sdg = useMemo(() => {
     const perYear: {
       [year: number]: { [country: string]: SDGScores };
@@ -96,8 +99,11 @@ export function SvgMap({
   );
 
   const color = useMemo(
-    () => d3.scaleSequential([0, 100], d3.interpolateYlGn),
-    [],
+    () =>
+      secondYear !== null
+        ? d3.scaleSequential([-50, 50], d3.interpolateRdYlGn)
+        : (d3.scaleSequential([0, 100], d3.interpolateYlGn) as any),
+    [secondYear !== null],
   );
 
   const path = useMemo(() => {
@@ -151,7 +157,13 @@ export function SvgMap({
               ? f.properties!.name
               : translateName(f.properties!.name);
           const fillColor =
-            name === undefined ? "#BBBBBB" : color(sdg[year][name][goal]);
+            name === undefined
+              ? "#BBBBBB"
+              : color(
+                  secondYear !== null
+                    ? sdg[secondYear][name][goal] - sdg[year][name][goal]
+                    : sdg[year][name][goal],
+                );
 
           return (
             <path
@@ -168,7 +180,7 @@ export function SvgMap({
         })}
       </g>
     ),
-    [height, width],
+    [height, width, secondYear !== null],
   );
 
   useEffect(() => {
@@ -197,12 +209,20 @@ export function SvgMap({
       if (!name) continue;
 
       const fillColor = sdg[year][name]
-        ? color(sdg[year][name][goal])
+        ? color(
+            secondYear !== null
+              ? sdg[secondYear][name][goal] - sdg[year][name][goal]
+              : sdg[year][name][goal],
+          )
         : "#BBBBBB";
+
+      // if (secondYear !== null) {
+      //   console.log(name, sdg[secondYear][name][goal] - sdg[year][name][goal]);
+      // }
 
       path.style.fill = fillColor;
     }
-  }, [year, goal, color, sdg]);
+  }, [year, secondYear, goal, color, sdg]);
 
   // update map styling imperatively for performance reasons
   useEffect(() => {
@@ -259,7 +279,15 @@ export function SvgMap({
         {hovered && (
           <>
             <p className="font-bold">{hovered}</p>
-            <p>{sdg[year][hovered] ? sdg[year][hovered][goal] : "N/A"}</p>
+            <p>
+              {sdg[year][hovered]
+                ? secondYear !== null
+                  ? (
+                      sdg[secondYear][hovered][goal] - sdg[year][hovered][goal]
+                    ).toFixed(1)
+                  : sdg[year][hovered][goal]
+                : "N/A"}
+            </p>
           </>
         )}
       </div>

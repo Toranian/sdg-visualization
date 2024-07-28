@@ -11,6 +11,8 @@ type SDGMapProps = {
   setYear: Dispatch<SetStateAction<number>>;
   goal: SDGCol;
   setGoal: Dispatch<SetStateAction<SDGCol>>;
+  secondYear: number | null;
+  setSecondYear: Dispatch<SetStateAction<number | null>>;
   data: SDGRow[];
   topology: Topology;
 };
@@ -18,31 +20,86 @@ type SDGMapProps = {
 export function SDGMap({
   year,
   setYear,
+  secondYear,
+  setSecondYear,
   goal,
   setGoal,
   data,
   topology,
 }: SDGMapProps) {
+  console.log(secondYear);
   const yearInput = (
     <div className="p-3 rounded-lg bg-white flex flex-row gap-3">
       <label htmlFor="yearinput" className="font-bold">
         Year:
       </label>
-      <span>{year}</span>
-      <input
-        id="yearinput"
-        type="range"
-        min="2000"
-        max="2022"
-        defaultValue="2022"
-        list="yearvalues"
-        onInput={(e) => setYear(parseInt(e.currentTarget.value))}
-      />
+      <span>
+        {year}
+        {secondYear && "/" + secondYear.toString()}
+      </span>
+      <div className="flex flex-col">
+        <input
+          id="yearinput"
+          type="range"
+          min="2000"
+          max="2022"
+          value={year}
+          list="yearvalues"
+          onInput={(e) => {
+            if (secondYear) {
+              const newYear = parseInt(e.currentTarget.value);
+              if (newYear < secondYear) {
+                setYear(newYear);
+              } else {
+                setYear(secondYear - 1);
+              }
+            } else {
+              setYear(parseInt(e.currentTarget.value));
+            }
+          }}
+        />
+        {secondYear !== null && (
+          <input
+            id="secondyearinput"
+            type="range"
+            min="2000"
+            max="2022"
+            value={secondYear}
+            list="yearvalues"
+            onInput={(e) => {
+              const newSecondYear = parseInt(e.currentTarget.value);
+              if (newSecondYear > year) {
+                setSecondYear(newSecondYear);
+              } else {
+                setSecondYear(year + 1);
+              }
+            }}
+          />
+        )}
+      </div>
       <datalist className="text-white bg-white" id="yearvalues">
         {[...Array(23).keys()].map((_, i) => (
           <option key={i} value={2000 + i} label={(2000 + i).toString()} />
         ))}
       </datalist>
+      <button
+        className="px-1.5 py-0.5 border-gray-400 bg-gray-200 border-2 rounded-md grid place-items-center"
+        onClick={() => {
+          if (secondYear) {
+            setYear(secondYear);
+            setSecondYear(null);
+          } else {
+            if (year == 2022) {
+              setYear(2021);
+              setSecondYear(2022);
+            } else {
+              setSecondYear(year + 1);
+            }
+          }
+        }}
+      >
+        {secondYear ? "Year" : "Range"}
+      </button>
     </div>
   );
 
@@ -109,7 +166,12 @@ export function SDGMap({
         <div className="h-auto px-4 py-2 rounded-lg bg-white flex flex-row gap-3">
           {/* @ts-ignore */}
           <Legend
-            color={d3.scaleSequential([0, 100], d3.interpolateYlGn) as any}
+            color={
+              secondYear
+                ? d3.scaleSequential([-50, 50], d3.interpolateRdYlGn)
+                : (d3.scaleSequential([0, 100], d3.interpolateYlGn) as any)
+            }
+            // color={d3.scaleSequential([0, 100], d3.interpolateYlGn) as any}
             title="SDG Goal Progress"
           />
         </div>
@@ -221,6 +283,7 @@ export function SDGMap({
           sdgRows={data}
           topology={topology}
           year={year}
+          secondYear={secondYear}
           goal={goal as any}
           onClickHandler={(name) => setSelectedCountry(name)}
         />
