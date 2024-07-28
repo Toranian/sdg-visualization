@@ -46,7 +46,7 @@ export default function ScatterPage({ data }: ScatterPageProps) {
       </div>
 
       {/* Right side with options */}
-      <div className="w-full md:col-span-1 border-solid border-l border-zinc-300 flex flex-col items-center ">
+      <div className="w-full md:col-span-1 border-solid border-l border-zinc-300 flex flex-col items-center px-3">
         <div className="max-w-xl mt-8">
           <h2 className="text-2xl font-semibold mb-2">Select SDG's</h2>
           <p className="mb-1">
