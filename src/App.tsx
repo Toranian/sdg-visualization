@@ -19,7 +19,7 @@ function App() {
   const [data, setData] = useState<SDGRow[]>([]);
   const [topology, setTopology] = useState<null | Topology>(null);
   const [displayMode, setDisplayMode] = useState<DisplayMode>(
-    DisplayMode.Chart,
+    DisplayMode.Scatter,
   );
 
   const getData = async () => {

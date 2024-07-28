@@ -39,9 +39,10 @@ export default function Scatter({
         return;
       }
 
-      if (year && String(row[SDGCol.YEAR]) !== String(year)) return;
+      // if (year && String(row[SDGCol.YEAR]) !== String(year)) return;
       newRow[index] = row[col];
       newRow["country"] = row[SDGCol.COUNTRY];
+      newRow["year"] = row[SDGCol.YEAR];
     });
     return newRow;
   });
@@ -85,12 +86,12 @@ export default function Scatter({
       .scaleOrdinal()
       .domain(selectedCountries || [])
       .range([
-        "#F8766D80",
-        "#00BA3880",
-        "#619CFF80",
-        "#eeee0080",
-        "#ff00ff80",
-        "#0fee0580",
+        "#F8766D",
+        "#00BA38",
+        "#619CFF",
+        "#eeee00",
+        "#ff00ff",
+        "#0fee05",
       ]);
 
     const tooltip = d3
@@ -112,7 +113,12 @@ export default function Scatter({
       .append("circle")
       .attr("cx", (d) => xScale(d[0]))
       .attr("cy", (d) => yScale(d[1]))
-      .attr("r", 5)
+      .attr("r", (d) =>
+        year !== undefined && d["year"] === year.toString() ? 6 : 5,
+      )
+      .attr("opacity", (d) =>
+        year === undefined ? 0.9 : d["year"] === year.toString() ? 1 : 0.1,
+      )
       // @ts-ignore
       .attr("fill", (d) => color(d["country"]))
       .on("mouseover", (event, d) => {
