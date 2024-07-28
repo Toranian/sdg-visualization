@@ -101,8 +101,8 @@ export function SvgMap({
   const color = useMemo(
     () =>
       secondYear !== null
-        ? d3.scaleSequential([-50, 50], d3.interpolateRdYlGn)
-        : (d3.scaleSequential([0, 100], d3.interpolateYlGn) as any),
+        ? d3.scaleSequential([-50, 50], d3.interpolatePiYG)
+        : (d3.scaleSequential([0, 100], d3.interpolateGreens) as any),
     [secondYear !== null],
   );
 

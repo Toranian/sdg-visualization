@@ -168,8 +168,8 @@ export function SDGMap({
           <Legend
             color={
               secondYear
-                ? d3.scaleSequential([-50, 50], d3.interpolateRdYlGn)
-                : (d3.scaleSequential([0, 100], d3.interpolateYlGn) as any)
+                ? d3.scaleSequential([-50, 50], d3.interpolatePiYG)
+                : (d3.scaleSequential([0, 100], d3.interpolateGreens) as any)
             }
             // color={d3.scaleSequential([0, 100], d3.interpolateYlGn) as any}
             title="SDG Goal Progress"
@@ -263,7 +263,9 @@ export function SDGMap({
                         className="text-red-600 cursor-pointer"
                         onClick={() => {
                           return setAdditionalSDGs(
-                            additionalSDGs.filter((country) => country !== asdg)
+                            additionalSDGs.filter(
+                              (country) => country !== asdg,
+                            ),
                           );
                         }}
                       >
