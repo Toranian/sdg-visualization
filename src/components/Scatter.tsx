@@ -39,7 +39,6 @@ export default function Scatter({
         return;
       }
 
-      // if (year && String(row[SDGCol.YEAR]) !== String(year)) return;
       newRow[index] = row[col];
       newRow["country"] = row[SDGCol.COUNTRY];
       newRow["year"] = row[SDGCol.YEAR];
