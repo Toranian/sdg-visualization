@@ -8,7 +8,7 @@ interface ScatterPageProps {
 
 export default function ScatterPage({ data }: ScatterPageProps) {
   const countries = Array.from(
-    new Set(data.map((row: SDGRow) => row[SDGCol.COUNTRY])),
+    new Set(data.map((row: SDGRow) => row[SDGCol.COUNTRY]))
   ).sort((a, b) => a.localeCompare(b));
 
   const [goalOne, setGoalOne] = useState<SDGCol | undefined>();
@@ -25,7 +25,7 @@ export default function ScatterPage({ data }: ScatterPageProps) {
   ];
 
   return (
-    <div className="w-screen h-screen grid flex flex-col md:grid-cols-4">
+    <div className="w-screen h-screen max-h-screen grid flex-col md:grid-cols-4 overflow-y-hidden">
       {/* Left side with scatter plot*/}
       <div className="md:col-span-3 h-full w-full flex justify-center items-center">
         {goalOne && goalTwo && selectedCountries.length > 0 ? (
@@ -185,7 +185,7 @@ export default function ScatterPage({ data }: ScatterPageProps) {
                   className="text-red-600 cursor-pointer"
                   onClick={() => {
                     return setSelectedCountries(
-                      selectedCountries.filter((country) => country !== c),
+                      selectedCountries.filter((country) => country !== c)
                     );
                   }}
                 >
