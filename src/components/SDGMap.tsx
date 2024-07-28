@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { SDGCol, SDGColDescriptions, SDGRow, Topology } from "../types";
 import * as d3 from "d3";
 import { SvgMap } from "./SvgMap";
@@ -154,6 +154,17 @@ export function SDGMap({
     "#0fee0580",
     "#eee020",
   ];
+
+  useEffect(() => {
+    function closePopup(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+
+      setSelectedCountry(undefined);
+      setAdditionalSDGs([]);
+    }
+    window.addEventListener("keydown", closePopup);
+    return () => window.removeEventListener("keydown", closePopup);
+  }, [selectedCountry !== undefined]);
 
   return (
     <>
