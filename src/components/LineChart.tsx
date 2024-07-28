@@ -128,7 +128,8 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         year: new Date(d.year, 0, 1),
         value: d[col],
       }));
-      const lastPoint = lineData[lineData.length - 1];
+
+      const lastPoint = lineData[lineData.length - 3];
 
       svg
         .append("path")
@@ -169,7 +170,8 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
                 ${d.year.getFullYear()}: ${d.value}`,
             )
             .style("left", `${event.pageX + 5}px`)
-            .style("top", `${event.pageY - 28}px`);
+            .style("top", `${event.pageY - 28}px`)
+            .style("z-index", 1000);
         })
         .on("mouseout", () => {
           tooltip.transition().duration(500).style("opacity", 0);
@@ -188,9 +190,6 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
     });
 
     // Debugging
-    console.log("Filtered Data:", filteredData);
-    console.log("X Scale Domain:", x.domain());
-    console.log("Y Scale Domain:", y.domain());
   }, [filteredData, country, cols, data]);
 
   return <svg ref={svgRef} id="scatter"></svg>;

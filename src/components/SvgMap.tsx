@@ -8,6 +8,7 @@ type SVGMapProps = {
   sdgRows: SDGRow[];
   year: number;
   goal: keyof SDGScores;
+  onClickHandler: (country: string) => void;
 };
 
 function translateName(geoName: string): string | undefined {
@@ -52,7 +53,13 @@ function partition<T>(array: T[], isValid: (x: T) => boolean): [T[], T[]] {
   );
 }
 
-export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
+export function SvgMap({
+  topology,
+  year,
+  goal,
+  sdgRows,
+  onClickHandler,
+}: SVGMapProps) {
   const sdg = useMemo(() => {
     const perYear: {
       [year: number]: { [country: string]: SDGScores };
@@ -155,7 +162,7 @@ export function SvgMap({ topology, year, goal, sdgRows }: SVGMapProps) {
               stroke="#000000"
               strokeWidth="1px"
               fill={fillColor}
-              onClick={() => console.log("clicked on", name)}
+              onClick={() => onClickHandler(name)}
             ></path>
           );
         })}

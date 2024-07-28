@@ -24,10 +24,6 @@ export default function ScatterPage({ data }: ScatterPageProps) {
     "#eee020",
   ];
 
-  // useEffect(() => {
-  //   console.log(selectedCountries);
-  // }, [selectedCountries, goalOne]);
-
   return (
     <div className="w-screen h-screen grid flex flex-col md:grid-cols-4">
       {/* Left side with scatter plot*/}

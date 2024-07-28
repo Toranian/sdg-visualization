@@ -37,14 +37,23 @@ function App() {
 
   return (
     <div className="max-w-screen max-h-screen overflow-hidden">
+      <div className="absolute z-10 right-3 top-3">
+        <button
+          className="bg-white  border-blue-500 border-2 border-solid px-3 py-2.5 rounded-lg text-bold text-blue-800 cursor-pointer"
+          onClick={() =>
+            displayMode === DisplayMode.Map
+              ? setDisplayMode(DisplayMode.Scatter)
+              : setDisplayMode(DisplayMode.Map)
+          }
+        >
+          {displayMode === DisplayMode.Map ? "Compare Countries" : "View Map"}
+        </button>
+      </div>
+
       <div className="flex flex-row gap-2 z-[1000] fixed top-0 left-0 p-3">
-        <button className="" onClick={() => setDisplayMode(DisplayMode.Map)}>
-          Map
-        </button>
-        <button onClick={() => setDisplayMode(DisplayMode.Scatter)}>
-          Scatter
-        </button>
-        <button onClick={() => setDisplayMode(DisplayMode.Chart)}>Chart</button>
+        <h2 className="text-xl text-semibold">
+          Sustainability Development Goals
+        </h2>
       </div>
       {displayMode === DisplayMode.Map && topology !== null && (
         <SDGMap {...{ year, setYear, goal, setGoal, data, topology }} />
