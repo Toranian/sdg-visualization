@@ -101,8 +101,8 @@ export function SvgMap({
   const color = useMemo(
     () =>
       secondYear !== null
-        ? d3.scaleSequential([-50, 50], d3.interpolateRdYlGn)
-        : (d3.scaleSequential([0, 100], d3.interpolateYlGn) as any),
+        ? d3.scaleSequential([-50, 50], d3.interpolatePiYG)
+        : (d3.scaleSequential([0, 100], d3.interpolateGreens) as any),
     [secondYear !== null],
   );
 
@@ -189,6 +189,14 @@ export function SvgMap({
     const pathGroup = d3.select(gRef.current);
     const zoom = d3
       .zoom<SVGGElement, unknown>()
+      .extent([
+        [0, 0],
+        [width, height],
+      ])
+      .translateExtent([
+        [0, 0],
+        [width, height],
+      ])
       .scaleExtent([1, 8])
       .on("zoom", ({ transform }) => {
         pathGroup.attr("transform", transform);
@@ -196,6 +204,9 @@ export function SvgMap({
       });
     // @ts-ignore
     pathGroup.call(zoom);
+    () => {
+      pathGroup.on("zoom", null);
+    };
   }, [gRef.current, width, height]);
 
   let svgRef = useRef<SVGSVGElement>(null);
