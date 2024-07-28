@@ -80,7 +80,7 @@ export const SDGColDescriptions: { [key in SDGCol]: string } = {
   [SDGCol.GOAL_3_SCORE]: "Good Health and Wellbeing",
   [SDGCol.GOAL_4_SCORE]: "Quality Education",
   [SDGCol.GOAL_5_SCORE]: "Gender Equality",
-  [SDGCol.GOAL_6_SCORE]: "Water and Sanitation",
+  [SDGCol.GOAL_6_SCORE]: "Clean Water and Sanitation",
   [SDGCol.GOAL_7_SCORE]: "Affordable and Clean Energy",
   [SDGCol.GOAL_8_SCORE]: "Decent Work and Economic Growth",
   [SDGCol.GOAL_9_SCORE]: "Industry, Innovation and Infrastructure",

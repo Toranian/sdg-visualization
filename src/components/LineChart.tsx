@@ -50,7 +50,7 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
     const x = d3
       .scaleTime()
       .domain(
-        d3.extent(filteredData, (d) => new Date(d.year, 0, 1)) as [Date, Date],
+        d3.extent(filteredData, (d) => new Date(d.year, 0, 1)) as [Date, Date]
       )
       .range([0, width]);
 
@@ -67,8 +67,8 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         d3
           .axisBottom(x)
           .tickFormat((d: Date | d3.NumberValue, _: number) =>
-            d3.timeFormat("%Y")(d as Date),
-          ),
+            d3.timeFormat("%Y")(d as Date)
+          )
       );
 
     svg.append("g").call(d3.axisLeft(y));
@@ -129,7 +129,7 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         value: d[col],
       }));
 
-      const lastPoint = lineData[lineData.length - 3];
+      const lastPoint = lineData[lineData.length - 4];
 
       svg
         .append("path")
@@ -149,7 +149,7 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
         .attr("stroke-width", 12)
         .attr("d", line as any) // Cast line to any to avoid TypeScript error
 
-        .on("mouseover", function(event) {
+        .on("mouseover", function (event) {
           const [xPos, _] = d3.pointer(event);
           const x0 = x.invert(xPos);
 
@@ -166,8 +166,10 @@ export default function LineChart({ cols, data, country }: LineChartProps) {
           // Show tooltip with formatted data
           tooltip
             .html(
-              `<strong>${SDGColDescriptions[col] || "No description"}</strong><br/>
-                ${d.year.getFullYear()}: ${d.value}`,
+              `<strong>${
+                SDGColDescriptions[col] || "No description"
+              }</strong><br/>
+                ${d.year.getFullYear()}: ${d.value}`
             )
             .style("left", `${event.pageX + 5}px`)
             .style("top", `${event.pageY - 28}px`)
