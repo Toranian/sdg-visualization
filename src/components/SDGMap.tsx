@@ -138,9 +138,6 @@ export function SDGMap({
                 <div className="flex flex-col gap-2 border-l-2 border-solid border-zinc-300 px-3">
                   <h2>Select Additional SDG's for {selectedCountry}</h2>
 
-                  <label htmlFor="goalinput" className="font-semibold">
-                    SDG Score 2
-                  </label>
                   <div className="p-3 rounded-lg bg-white flex gap-3 border-solid border-zinc-300 border mt-2 w-full">
                     <select
                       id="goalinput"
